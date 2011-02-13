@@ -1,0 +1,74 @@
+#!/bin/sh
+CC_USER=cimaster
+CC_INSTALL_DIR=/opt/cruisecontrol
+CC_WORK_DIR=$CC_INSTALL_DIR
+CC_LOGFILE_DIR=$CC_INSTALL_DIR
+export JAVA_HOME=/usr/lib/jvm/java-6-sun
+PATH_ADDITIONS=
+CC_WEBPORT=8484
+CC_JMXPORT=8888
+CC_RMIPORT=
+NAME=cruisecontrol
+DESC="CruiseControl - continuous integration build loop"
+PATH=/usr/lib/jvm/java-6-sun/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin:/bin
+if [ -n "$PATH_ADDITIONS" ]; then
+PATH=$PATH_ADDITIONS:$PATH
+fi
+export PATH
+CC_DAEMON=$CC_INSTALL_DIR/cruisecontrol.sh
+CC_CONFIG_FILE=$CC_INSTALL_DIR/config.xml
+CC_LOG_FILE=$CC_LOGFILE_DIR/cruisecontrol.log
+CC_COMMAND="cd $CC_WORK_DIR; $CC_DAEMON -configfile $CC_CONFIG_FILE -webport $CC_WEBPORT -jmxport $CC_JMXPORT"
+if [ -f /etc/default/cruisecontrol ]; then
+. /etc/default/cruisecontrol
+fi
+test -f $CC_DAEMON || (echo "The executable $CC_DAEMON does not exist!" && exit 0)
+if [ `id -u` -ne 0 ]; then
+echo "Not starting/stopping $DESC, you are not root."
+exit 4
+fi
+PARPID=`ps -ea -o "pid ppid args" | grep -v grep | grep "${CC_INSTALL_DIR}" | sed -e 's/^ *//' -e 's/ .*//'`
+if [ "${PARPID}" != "" ]
+then
+PID=`ps -ea -o "pid ppid args" | grep -v grep | grep java | grep "${PARPID}" | \
+sed -e 's/^ *//' -e 's/ .*//'`
+fi
+case "$1" in
+'start')
+env >> cc.startup.env
+su $CC_USER -c "/bin/sh -c \"$CC_COMMAND >> $CC_LOG_FILE 2>&1\"" & RETVAL=$?
+echo "$NAME started with jmx on port ${CC_JMXPORT}"
+;;
+'stop')
+if [ "${PID}" != "" ]; then
+kill -9 ${PID} ${PARPID}
+$0 status
+RETVAL=$?
+else
+echo "$NAME is not running"
+RETVAL=1
+fi
+;;
+'status')
+# echo PARPIDs $PARPID
+# echo PIDs $PID
+kill -0 $PID >/dev/null 2>&1
+if [ "$?" = "0" ]; then
+echo $NAME \(pids $PARPID $PID\) is running
+RETVAL=0
+else
+echo "$NAME is stopped"
+RETVAL=1
+fi
+;;
+'restart')
+$0 stop && $0 start
+RETVAL=$?
+;;
+*)
+echo "Usage: $0 { start | stop | status | restart }"
+exit 1
+;;
+esac
+#echo ending $0 $$....
+exit 0

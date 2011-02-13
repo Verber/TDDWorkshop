@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="idom" default="build" basedir=".">
+  <property name="svn_tags_url" value="http://192.168.1.2/svn/idom/tags" />
+  <property name="source_dir"   value="${basedir}/source" />
+  <property name="locales_dir" value="${source_dir}/system/application/language/locale" />
+  <property name="build_dir"    value="${basedir}/build" />
+  <property name="test_dir"     value="${source_dir}/system/application/tests" />
+  <property name="docroot_demo" value="/var/www/localhost/htdocs/idom" />
+  <property name="cimake"       value="${source_dir}/system/application/tests/cimake" />
+  <property name="prod_key"     value="/etc/svnkey/id_rsa" />
+  <property name="prod_user"    value="dev" />
+  <property name="prod_host"    value="app.idom.net.ua" />
+  <property name="basedir_production" value="/home/www/idom.net.ua" />
+  <property name="docroot_production" value="/home/www/idom.net.ua/public_html" />
+  <property name="basedir_production_fr" value="/home/dev/www/immodiscount.fr" />
+  <property name="docroot_production_fr" value="/home/www/idom.net.ua/public_html" />
+  <property name="cron_scripts_dir" value="/system/application/cron/" />
+  <property name="wiki_templates_dir" value="/var/www/localhost/htdocs/docuwiki/lib/tpl/" />
+  <property name="wiki_template_name" value="idom_template" />
+  <property name="svn_wiki_tpl_url" value="http://192.168.1.2/svn/idom/wiki/lib/tpl/idom_template" />
+  <property name="db_host"  value="localhost" />
+  <property name="db_user"  value="root" />
+  <property name="db_pass"  value="aaaaaaa" />
+  <property name="db_db_main"  value="idom_db" />
+  <property name="db_db_test"  value="idom_db_test" />
+
+  <target name="build" depends="db-deploy-test,update-regions-test,update-maxmind,flow-near-names,php-documentor,php-codesniffer,test,create-tag,create-last-tag,deploy-demo,update-regions-demo,update-wiki-template,set-permissions" />
+
+  <target name="set-permissions" depends="set-system-permissions,set-photos-permissions,set-captcha-permissions" description="Set permissions required for CI" />
+
+  <target name="set-system-permissions" description="Set permissions required for CI core">
+    <chgrp group="www-data" type="both">
+        <fileset dir="${docroot_demo}/system/logs" />
+        <fileset dir="${docroot_demo}/system/cache" />
+    </chgrp>
+    <chmod perm="775" type="dir">
+        <fileset dir="${docroot_demo}/system/logs" />
+        <fileset dir="${docroot_demo}/system/cache" />
+    </chmod>
+  </target>
+
+  <target name="set-photos-permissions" depends="check_photos" if="photos-dir-exists" description="Set permissions required for photo uploads">
+    <chgrp group="www-data" type="both">
+      <fileset dir="${docroot_demo}/photos" />
+    </chgrp>
+    <chmod perm="775" type="dir">
+      <fileset dir="${docroot_demo}/photos" />
+    </chmod>
+    <chmod perm="664" type="file">
+      <fileset dir="${docroot_demo}/photos" />
+    </chmod>
+  </target>
+
+  <target name="check_photos">
+    <available property="photos-dir-exists" file="${docroot_demo}/photos" type="dir" />
+  </target>
+
+  <target name="set-captcha-permissions" depends="check_captcha" if="captcha-dir-exists" description="Set permissions required for CAPTCHA">
+    <chgrp group="www-data" type="both">
+       <fileset dir="${docroot_demo}/img/captcha" />
+    </chgrp>
+    <chmod perm="775" type="dir">
+       <fileset dir="${docroot_demo}/img/captcha" />
+    </chmod>
+  </target>
+
+  <target name="check_captcha">
+    <available property="captcha-dir-exists" file="${docroot_demo}/img/captcha" type="dir" />
+  </target>
+
+  <target name="photos-migrate" description="Copy object photos from old ierarchy to new">
+    <exec executable="find" dir="${docroot_demo}/photos">
+      <arg line="sellers -type d -regex '.*/objects/.*' -execdir cp -av {} ../../../objects/ ;" />
+    </exec>
+  </target> 
+
+  <target name="create-tag" depends="test" description="Creates tag for successfull build" if="label">
+    <exec executable="svn" dir="${source_dir}"> 
+      <arg line="copy ./ ${svn_tags_url}/${ant.project.name}.1.${label} -m 'Tag for ${label} added'" />
+    </exec>
+  </target>
+
+  <target name="update-kml-demo" depends="db-deploy-demo" description="Load district polygons from wikimapia to demo database">
+    <exec executable="php" dir="${source_dir}${cron_scripts_dir}">
+    	<arg line="load_kmls.php db_env=default_test" />
+    </exec>
+  </target>
+
+  <target name="update-kml-test" depends="db-deploy-test" description="Load district polygons from wikimapia to test database">
+      <exec executable="php" dir="${source_dir}${cron_scripts_dir}">
+        <arg line="load_kmls.php" />
+      </exec>
+  </target>
+
+  <target name="update-regions-demo" depends="db-deploy-demo,set-default-near-names-country" description="Load district polygons from dump to demo database">
+  	<exec executable="mysql" dir="${source_dir}/sql">
+	  <arg line="-u root -pyakuake idom_db -e 'source idom_estate_near_objects_${country}.sql'" />
+	</exec>
+  </target>
+
+  <target name="update-regions-test" depends="db-deploy-test,set-default-near-names-country" description="Load district polygons from dump to test database">
+	<exec executable="mysql" dir="${source_dir}/sql">
+       	  <arg line="-u root -pyakuake idom_db_test -e 'source idom_estate_near_objects_${country}.sql'" />
+	</exec>
+  </target>
+
+  <target name="update-regions" depends="set-default-near-names-country,update-regions-demo,update-regions-test" description="Load district polygons from dump to database">
+  </target>
+
+
+  <target name="db-reset-test" description="Reset test database">
+    <exec executable="${cimake}" dir="${test_dir}"> 
+      <arg line="reset_structure" />
+    </exec>
+  </target>
+
+  <target name="db-reset-demo" description="Reset demo database">
+    <exec executable="${cimake}" dir="${test_dir}"> 
+      <arg line="reset_structure dsn=mysql://${db_user}:${db_pass}@${db_host}/${db_db_main}" />
+    </exec>
+  </target>
+
+  <target name="db-deploy-test" depends="db-reset-test" description="Load fixtures to test database"> 
+    <exec executable="${cimake}" dir="${test_dir}"> 
+      <arg line="load_fixtures" />
+    </exec>
+  </target>
+
+  <target name="db-deploy-demo" description="Load migrations to demo database"> 
+    <exec executable="${cimake}" dir="${test_dir}"> 
+      <arg line="load_migrations dsn=mysql://${db_user}:${db_pass}@${db_host}/${db_db_main}" />
+    </exec>
+  </target>
+
+  <target name="db-fixt-demo" description="Load fixtures to demo DB">
+    <exec executable="${cimake}" dir="${test_dir}">
+      <arg line="load_fixtures dsn=mysql://${db_user}:${db_pass}@${db_host}/${db_db_main}" />
+    </exec>
+  </target>
+
+  <target name="php-documentor" description="Generate project documentation">
+    <exec executable="phpdoc" dir="${source_dir}" logerror="on">
+      <arg line="--ignore */tests/*,*/libraries/fooStack/* 
+                 --title '${ant.project.name}' 
+                 --undocumentedelements on 
+                 --target ${basedir}/build/api 
+                 --directory system/application 
+                 --templatebase '/opt/phpundercontrol/source/data/phpdoc' 
+                 --output HTML:Phpuc:phpuc"/>
+    </exec>
+  </target>
+ 
+  <target name="php-codesniffer" description="Check syntax of source code files">
+    <exec executable="phpcs" 
+      dir="${source_dir}" 
+      error="/tmp/checkstyle.error.log"
+      output="${basedir}/build/logs/checkstyle.xml">
+
+      <arg line="--report=checkstyle 
+                 --standard=Codeigniter
+                 --ignore=system/application/controllers/migrate.php,system/application/helpers/db_util_helper.php,*/config/*,*/tests/*,*/tests/models/*,*/tests/fixtures/*,*/tests/libs/*,*/libraries/fooStack/*,*/views/*,*/errors/*,system/application/migrations,system/application/helpers/MY_string_helper.php,system/application/helpers/dbutil_helper.php 
+                 system/application"/>
+    </exec> 
+  </target> 
+
+  <target name="test" description="Run Unit Test">
+    <exec executable="phpunit" dir="${source_dir}" failonerror="on">
+      <arg line="--log-xml ${build_dir}/logs/phpunit.xml
+                 --log-pmd ${build_dir}/logs/phpunit.pmd.xml
+                 --log-metrics ${build_dir}/logs/phpunit.metrics.xml
+                 --coverage-xml ${build_dir}/logs/phpunit.coverage.xml
+                 --coverage-html ${build_dir}/coverage
+                 --configuration ${basedir}/phpunit.xml AllTests ${test_dir}/AllTests.php" />
+    </exec>
+  </target>
+
+  <target name="filter-test" description="Run Unit Test by filter" if="test">
+    <exec executable="phpunit" dir="${source_dir}" failonerror="on">
+      <arg line="--filter ${test} --verbose AllTests ${test_dir}/AllTests.php" />
+    </exec>
+  </target>
+
+  <target name="backup-database" description="Save current DB to dump file">
+    <tstamp/>
+    <exec executable="mysqldump" dir="${source_dir}/sql" output="backup_${DSTAMP}_${TSTAMP}.sql">
+      <arg line="-u root -pyakuake -h localhost idom_db" />
+    </exec>   
+  </target>
+  
+  <target name="delete-last-build-tag">
+    <echo message="idom.build.last exists. Deleting..." />
+    <exec executable="svn" failonerror="off">
+      <arg line="delete ${svn_tags_url}/${ant.project.name}.build.last -m 'Removed last tag to overwirte it'" />
+    </exec>
+  </target>
+
+  <target name="create-last-tag" description="Creates tag for latest successfull build" depends="delete-last-build-tag" if="label">
+    <exec executable="svn" dir="${docroot_demo}">
+      <arg line="copy ${svn_tags_url}/${ant.project.name}.1.${label} ${svn_tags_url}/${ant.project.name}.build.last -m 'Created new idom.build.last'" />
+    </exec>
+  </target>
+
+  <target name="chksource_dir" if="label">
+    <available property="lets-switch" file="${docroot_demo}/.svn" type="dir" />
+    <condition property="lets-checkout">
+      <not> <isset property="lets-switch" /> </not>
+    </condition>
+  </target>
+
+  <target name="switch-demo" depends="chksource_dir" if="lets-switch">
+    <echo message="Working directory exist. Switching to tag ${label}..." />
+    <exec executable="svn" dir="${docroot_demo}">
+      <arg line="switch ${svn_tags_url}/${ant.project.name}.build.last ${docroot_demo}" />
+    </exec>
+  </target>
+
+  <target name="checkout-demo" depends="chksource_dir" if="lets-checkout">
+    <echo message="Working directory is not exist. Checking out..." />
+    <exec executable="svn" dir="${docroot_demo}">
+      <arg line="checkout ${svn_tags_url}/${ant.project.name}.build.last ${docroot_demo}" />
+    </exec>
+  </target>
+
+  <target name="deploy-demo" depends="switch-demo,checkout-demo,db-deploy-demo" description="Deploy build to demo server" />
+
+  <target name="update-wiki-template" depends="update-wiki,checkout-wiki,set-wiki-permissions" description="Updates wiki template from svn" />
+
+  <target name="set-wiki-permissions">
+    <chgrp group="www-data" type="both">
+      <fileset dir="${wiki_templates_dir}/${wiki_template_name}" />                                             
+    </chgrp>
+    <chmod perm="775" type="dir">
+      <fileset dir="${wiki_templates_dir}/${wiki_template_name}" />
+    </chmod>
+     <chmod perm="664" type="file">
+      <fileset dir="${wiki_templates_dir}/${wiki_template_name}" />
+    </chmod>
+  </target>
+
+  <target name="check-wiki-tpl">
+    <available property="lets-switch-wiki" file="${wiki_templates_dir}/${wiki_template_name}" type="dir" />
+    <condition property="lets-checkout-wiki">
+      <not> <isset property="lets-switch-wiki" /> </not>
+    </condition>
+  </target>
+
+  <target name="update-wiki" depends="check-wiki-tpl" if="lets-switch-wiki">
+    <echo message="Templte directory exist. Updating..." />
+    <exec executable="svn" dir="${wiki_templates_dir}/${wiki_template_name}">
+      <arg line="update" />
+    </exec>
+  </target>
+
+  <target name="checkout-wiki" depends="check-wiki-tpl" if="lets-checkout-wiki">
+    <echo message="Template directory is not exist. Checking out..." />
+    <exec executable="svn" dir="${wiki_templates_dir}">
+      <arg line="checkout ${svn_wiki_tpl_url} ${wiki_templates_dir}/${wiki_template_name}" />
+    </exec>
+  </target>
+
+  <target name="deploy-production" description="Deploy code to production server" if="svntag">
+    <exec executable="ssh" dir="${source_dir}">
+      <arg line="-i ${prod_key} ${prod_user}@${prod_host} 'ant -buildfile ${basedir_production}/build.xml deploy-production -Dsvntag=${svntag}'"/>
+    </exec>
+  </target>
+  
+  <target name="deploy-production-fr" description="Deploy code to production server (france)" if="svntag">
+    <exec executable="ssh" dir="${source_dir}">
+      <arg line="-i ${prod_key} ${prod_user}@${prod_host} 'ant -buildfile ${basedir_production_fr}/build.xml deploy-production -Dsvntag=${svntag}'"/>
+    </exec>
+  </target>
+
+  <target name="deploy-wiki-template-production" description="Deploy wiki template to production server wiki">
+    <exec executable="ssh" dir="${source_dir}">
+      <arg line="-i ${prod_key} ${prod_user}@${prod_host} 'ant -buildfile ${basedir_production}/build.xml update-wiki-template'" />
+    </exec>
+  </target>
+
+  <target name="start-rc" depends="stop-rc" description="Start selenium RC">
+    <exec executable="ssh" dir="${source_dir}">
+      <arg line="-i ${prod_key} radmin@192.168.1.97 'net start SeleniumRC'"/>
+    </exec>
+  </target>
+
+  <target name="stop-rc" description="Stop selenium RC">
+    <exec executable="ssh" dir="${source_dir}">
+      <arg line="-i ${prod_key} radmin@192.168.1.97 'net stop SeleniumRC'"/>
+    </exec>
+  </target>
+
+  <target name="update-maxmind" depends="check-csv,touch-csv,convert-csv-utf,import-csv" description="Update or install MaxMind database" />
+  
+  <target name="convert-csv-utf" depends="touch-csv">
+    <exec executable="iconv" dir="${source_dir}/sql/"> 
+      <arg line="-f ISO-8859-1 -t utf-8 geoip.csv -o geoip_utf.csv" />
+    </exec>
+  </target>
+  
+  <target name="import-csv" depends="import-csv-test,import-csv-main" />
+  
+  <target name="import-csv-test">
+    <exec executable="mysql" dir="${source_dir}/sql/" input="${source_dir}/sql/import_maxmind_csv.sql"> 
+      <arg line="-u ${db_user} -p${db_pass} -h ${db_host} ${db_db_test}" />
+    </exec>
+  </target>
+  
+  <target name="import-csv-main">
+    <exec executable="mysql" dir="${source_dir}/sql/" input="${source_dir}/sql/import_maxmind_csv.sql"> 
+      <arg line="-u ${db_user} -p${db_pass} -h ${db_host} ${db_db_main}" />
+    </exec>
+  </target>
+  
+  <target name="touch-csv" depends="check-csv" if="lets-touch">
+    <touch file="${source_dir}/sql/geoip_utf.csv" />
+  </target>
+    
+  <target name="check-csv">
+    <available property="lets-touch" file="${source_dir}/sql/geoip_utf.csv" type="file" />
+  </target>
+  
+  <target name="flow-near-names" depends="set-default-near-names-country,import-near-names-test,import-near-names-main" description="Flow table idom_estate_near_objects_names"/>
+  
+  <target name="set-default-near-names-country">
+      <condition property="country" value="ua">
+          <not>
+              <isset property="country"/>
+          </not>
+      </condition>
+  </target>
+  
+  <target name="import-near-names-test" if="country">
+      <exec executable="mysql" dir="${basedir}/sql/" input="${basedir}/sql/import_near_objects_names_csv_${country}.sql">
+          <arg line="-u ${db_user} -h ${db_host} -p${db_pass} ${db_db_test}"/>
+      </exec>
+  </target>
+  
+  <target name="import-near-names-main" if="country">
+      <exec executable="mysql" dir="${basedir}/sql/" input="${basedir}/sql/import_near_objects_names_csv_${country}.sql">
+          <arg line="-u ${db_user} -h ${db_host} -p${db_pass} ${db_db_main}"/>
+      </exec>
+  </target>
+
+  <target name="compile-mo-files" depends="compile-mo-uk_ua,compile-mo-en_us" description="Compile po files into mo files" />
+
+  <target name="compile-mo-uk_ua">
+    <exec executable="msgfmt" dir="${locales_dir}/uk_UA/LC_MESSAGES">
+      <arg line="-o lang.mo lang.po" />
+    </exec>
+  </target>
+
+  <target name="compile-mo-en_us">
+    <exec executable="msgfmt" dir="${locales_dir}/en_US/LC_MESSAGES">
+      <arg line="-o lang.mo lang.po" />
+    </exec>
+  </target>
+  
+</project>
