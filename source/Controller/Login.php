@@ -9,12 +9,26 @@ class Controller_Login
 
     private $_correctLogin = 'admin';
     private $_correctPassword = 'password';
+    private $_isLoggedIn = FALSE;
 
-    public function login()
+    /**
+     * Logs user in
+     *
+     * @param string $login
+     * @param string $passowrd
+     *
+     * @return boolean
+     *
+     * @assert ('admin', 'password') == TRUE
+     * @assert ('admin', 'someword') == FALSE
+     * @assert ('user', 'password') == FALSE
+     * @assert ('user', 'someword') == FALSE
+     */
+    public function login($login, $passowrd)
     {
         return (
-            $_POST['login'] == $this->_correctLogin
-            && $_POST['password'] == $this->_correctPassword
+            $login == $this->_correctLogin
+            && $passowrd == $this->_correctPassword
         );
     }
 }
