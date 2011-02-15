@@ -1,18 +1,16 @@
 <?php
-require_once 'PHPUnit/Framework.php';
-
-class TestWithBadIsolation extends PHPUnit_Framework_TestCase
+class WithBadIsolationTest extends PHPUnit_Framework_TestCase
 {   
-    private $db;
-    
-    function setUp()
+    private static $db;
+
+    public static function setUpBeforeClass()
     {
-        $this->db = sqlite_open('phone_book');
+        self::$db = sqlite_open('phone_book');
     }
-    
-    function tearDown()
+
+    public static function tearDownAfterClass()
     {
-        sqlite_close($this->db);
+        sqlite_close(self::$db);
     }
     
     function testModelGet()
