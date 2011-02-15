@@ -1,5 +1,5 @@
 <?php
-require_once '../../source/bootstrap.php';
+require_once dirname(__FILE__) . '/../../source/bootstrap.php';
 /**
  * This class is example of simplest PHPUnit test case
  *
@@ -7,7 +7,7 @@ require_once '../../source/bootstrap.php';
  * @package  Introduction
  * @author   Ivan Mosiev <i.k.mosev@gmail.com>
  */
-class HelloPHPUnitTest extends PHPUnit_Framework_TestCase
+class PHPUnitIntro_HelloTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Example of failed test

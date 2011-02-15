@@ -6,7 +6,7 @@
  * @package  Introduction
  * @author   Ivan Mosiev <i.k.mosev@gmail.com>
  */
-class AnnotationsTests extends PHPUnit_Framework_TestCase
+class PHPUnitIntro_AnnotationsTest extends PHPUnit_Framework_TestCase
 {
     private static $db;
 

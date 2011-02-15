@@ -6,7 +6,7 @@
  * @package  Introduction
  * @author   Sebastian Bergmann, Ivan Mosiev <i.k.mosev@gmail.com>
  */
-class TemplateMethodsTest  extends PHPUnit_Framework_TestCase
+class PHPUnitIntro_TemplateMethodsTest  extends PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
