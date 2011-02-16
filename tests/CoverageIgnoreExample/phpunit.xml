@@ -1,0 +1,24 @@
+<phpunit>
+    <filter>
+        <blacklist>
+            <directory>./</directory>
+        </blacklist>
+        <whitelist>
+            <directory suffix=".php">./system/application</directory>
+            <exclude>
+                <directory suffix=".php">./system/application/language</directory>
+                <directory suffix=".php">./system/application/errors</directory>
+		<directory suffix=".php">./system/application/tests</directory>
+                <directory suffix=".php">./system/application/config_template</directory>
+                <directory suffix=".php">./system/application/cli</directory>
+                <directory suffix=".php">./system/application/doctrine</directory>
+                <directory suffix=".php">./system/application/config</directory>
+                <directory suffix=".php">./system/application/views</directory>
+                <file>./system/application/libraries/wdg_xml.php</file>
+                <file>./system/application/libraries/Recaptchalib.php</file>
+                <file>./system/application/hooks/doctrine.php</file>
+                <directory suffix=".php">./system/application/libraries/fooStack</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>
