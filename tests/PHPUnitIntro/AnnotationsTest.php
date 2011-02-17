@@ -1,47 +1,109 @@
 <?php
 /**
- * This class is example of simplest PHPUnit test case
+ * This class is example of PHPUnit annotations
  *
- * @category Examples
- * @package  Introduction
  * @author   Ivan Mosiev <i.k.mosev@gmail.com>
  */
 class PHPUnitIntro_AnnotationsTest extends PHPUnit_Framework_TestCase
 {
-    private static $db;
-
-    public static function setUpBeforeClass()
+    /**
+     * @group exceptions
+     * @expectedException \Model\Account\Exception
+     */
+    public function testConstructorException()
     {
-        self::$db = sqlite_open('phone_book');
+        $account = new \Model\Account('some shit');
     }
 
-    public static function tearDownAfterClass()
+    public function testConstructorZero()
     {
-        sqlite_close(self::$db);
+        $account = new \Model\Account(0.0);
+        $this->assertSame(0.0, $account->getBalance());
     }
 
-    function testModelGet()
+    public function testGetBalance()
     {
-        $query_res = sqlite_array_query(self::$db, "SELECT * FROM phone_book");
-        $entry = $query_res[1];
-        $this->assertEquals('Bill', $entry['name']);
+        $account = new \Model\Account(123.32);
+        $this->assertEquals(123.32, $account->getBalance());
     }
 
-    function testModelAppend()
+    /**
+     * @depends testGetBalance
+     */
+    public function testDeposit()
     {
-        sqlite_query(self::$db, "INSERT INTO phone_book VALUES('Phill', '123-54-67')");
-        $sql_res = sqlite_single_query(self::$db, "SELECT COUNT(*) FROM phone_book");
-        $this->assertEquals(3, $sql_res);
-        $sql_res = sqlite_single_query(self::$db, "SELECT phone FROM phone_book WHERE name = 'Phill'");
-        $this->assertEquals('123-54-67', $sql_res);
+        $initial_balance = 123.32;
+        $deposit = 21.13;
+        $account = new \Model\Account($initial_balance);
+        $account->deposit($deposit);
+        $this->assertEquals($deposit + $initial_balance, $account->getBalance());
     }
 
-    function testModelDelete()
+    /**
+     * @group exceptions
+     * @expectedException \Model\Account\Exception
+     */
+    public function testDepositExceptionNegative()
     {
-        sqlite_query(self::$db, "DELETE FROM phone_book WHERE name = 'Phill'");
-        $sql_res = sqlite_single_query(self::$db, "SELECT COUNT(*) FROM phone_book");
-        $this->assertEquals(2, $sql_res);
-        $sql_res = sqlite_single_query(self::$db, "SELECT phone FROM phone_book WHERE name = 'Phill'");
-        $this->assertEquals(null, $sql_res);
+        $deposit = -5;
+        $account = new \Model\Account(0.0);
+        $account->deposit($deposit);
+    }
+
+    /**
+     * @group exceptions
+     * @expectedException \Model\Account\Exception
+     */
+    public function testDepositExceptionNotFloat()
+    {
+        $deposit = 'something';
+        $account = new \Model\Account(0.0);
+        $account->deposit($deposit);
+    }
+
+    /**
+     * @group exceptions
+     * @expectedException \Model\Account\Exception
+     */
+    public function testPayExceptionNotFloat()
+    {
+        $account = new \Model\Account(0);
+        $account->pay('$pay_amount');
+
+    }
+
+    /**
+     * @group issue-122
+     * @group exceptions
+     * @expectedException \Model\Account\Exception
+     */
+    public function testPayExceptionNegative()
+    {
+        $account = new \Model\Account(0);
+        $account->pay(-12.11);
+    }
+
+    /**
+     * @depends testGetBalance
+     * @dataProvider providerTestPay
+     */
+    public function testPay($initial_balance, $pay_amount, $result, $rest)
+    {
+        $account = new \Model\Account($initial_balance);
+        $this->assertSame($result, $account->pay($pay_amount));
+        $this->assertEquals($rest, $account->getBalance());
+
+    }
+
+    public function providerTestPay()
+    {
+        return array(
+            array(123.23, 122.0, TRUE, 123.23 - 122.0),
+            array(0.0, 1.75, FALSE, 0.0),
+            array(0.0, 0.0, TRUE, 0.0),
+            array(213.21, 0.0, TRUE, 213.21),
+            array(132.21, 150.75, FALSE, 132.21),
+            array(534.12, 534.12, TRUE, 0.0)
+        );
     }
 }

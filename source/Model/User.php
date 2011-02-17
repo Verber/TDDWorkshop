@@ -1,10 +1,11 @@
 <?php
+namespace Model;
 /**
  * This class illustrates mocks and stubs usage
  *
  * @author Ivan Mosiev <i.k.mosev@gmail.com>
  */
-class Model_User {
+class User {
     public function save()
     {
     }

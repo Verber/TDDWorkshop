@@ -1,10 +1,12 @@
 <?php
+namespace Controller;
+
 /**
  * This is very simple controller
  *
  * @author Ivan Mosiev <i.k.mosev@gmail.com>
  */
-class Controller_Login
+class Login
 {
 
     private $_correctLogin = 'admin';
@@ -24,7 +26,7 @@ class Controller_Login
      * @assert ('user', 'password') == FALSE
      * @assert ('user', 'someword') == FALSE
      */
-    public function login($login, $passowrd)
+    public function checkLogin($login, $passowrd)
     {
         return (
             $login == $this->_correctLogin

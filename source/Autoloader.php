@@ -23,7 +23,7 @@ class Autoloader
 
         $class = dirname(__FILE__)
             . DIRECTORY_SEPARATOR
-            . str_replace('_', DIRECTORY_SEPARATOR, $className)
+            . str_replace('\\', DIRECTORY_SEPARATOR, $className)
             . '.php';
 
         if (file_exists($class)) {

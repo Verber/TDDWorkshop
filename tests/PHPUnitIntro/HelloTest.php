@@ -1,10 +1,8 @@
 <?php
-require_once dirname(__FILE__) . '/../../source/bootstrap.php';
+//require_once dirname(__FILE__) . '/../../source/bootstrap.php';
 /**
  * This class is example of simplest PHPUnit test case
  *
- * @category Examples
- * @package  Introduction
  * @author   Ivan Mosiev <i.k.mosev@gmail.com>
  */
 class PHPUnitIntro_HelloTest extends PHPUnit_Framework_TestCase
@@ -41,13 +39,11 @@ class PHPUnitIntro_HelloTest extends PHPUnit_Framework_TestCase
     function testArrangeActAssertExample()
     {
         //Arrange
-        $_POST = array(
-            'login'     => 'admin',
-            'password'  => 'password'
-        );
-        $loginController = new Controller_Login();
+        $login = 'admin';
+        $password = 'password';
+        $loginController = new Controller\Login;
         //Act
-        $result = $loginController->login();
+        $result = $loginController->checkLogin($login, $password);
         //Assert
         $this->assertTrue(
             $result,

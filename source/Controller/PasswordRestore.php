@@ -1,15 +1,16 @@
 <?php
+namespace Controller;
 /**
  * This class illustrates mocks and stubs usage
  *
  * @author Ivan Mosiev <i.k.mosev@gmail.com>
  */
-class Controller_PasswordRestore {
+class PasswordRestore {
     
     private $_mailer;
     private $_user;
 
-    public function  __construct(Lib_IMailer $mailer, Model_User $user) {
+    public function  __construct(\Lib\IMailer $mailer, \Model\User $user) {
         $this->_mailer = $mailer;
         $this->_user = $user;
     }

@@ -2,8 +2,6 @@
 /**
  * This class is test-case where all PHPUnit template methods are demonstrated
  * 
- * @category Examples
- * @package  Introduction
  * @author   Sebastian Bergmann, Ivan Mosiev <i.k.mosev@gmail.com>
  */
 class PHPUnitIntro_TemplateMethodsTest  extends PHPUnit_Framework_TestCase
