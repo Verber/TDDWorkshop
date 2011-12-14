@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="../source/bootstrap.php">
+<phpunit bootstrap="../source/bootstrap.php"
+    strict="true"
+    verbose="true"
+    colors="true">
 
 </phpunit>

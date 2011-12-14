@@ -23,7 +23,6 @@ class Circle
 	 */
 	function __construct($r)
 	{
-		$this->setRadius($r);
 	}
 
 	/**
@@ -35,11 +34,7 @@ class Circle
 	 */
 	function setRadius($r)
 	{
-		if (!is_float($r) || $r <= 0.0) {
-			throw new Argument_Exception();
-		}
-		 
-		$this->_radius = $r;
+		
 	}
 
 	/**
@@ -49,7 +44,6 @@ class Circle
 	 */
 	function getRadius()
 	{
-		return $this->_radius;
 	}
 
 	/**
@@ -59,8 +53,6 @@ class Circle
 	 */
 	function getSquare()
 	{
-		$r = $this->getRadius();
-		return $r * $r * pi();
 	}
 	 
 	/**
@@ -70,7 +62,5 @@ class Circle
 	 */
 	function getLength()
 	{
-		$r = $this->getRadius();
-		return 2.0 * $r * pi();
 	}
 }

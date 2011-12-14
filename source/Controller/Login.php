@@ -20,11 +20,6 @@ class Login
      * @param string $passowrd
      *
      * @return boolean
-     *
-     * @assert ('admin', 'password') == TRUE
-     * @assert ('admin', 'someword') == FALSE
-     * @assert ('user', 'password') == FALSE
-     * @assert ('user', 'someword') == FALSE
      */
     public function checkLogin($login, $passowrd)
     {

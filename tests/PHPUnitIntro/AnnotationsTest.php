@@ -7,6 +7,7 @@
 class PHPUnitIntro_AnnotationsTest extends PHPUnit_Framework_TestCase
 {
     /**
+     * @group account
      * @group exceptions
      * @expectedException \Model\Account\Exception
      */
@@ -37,6 +38,17 @@ class PHPUnitIntro_AnnotationsTest extends PHPUnit_Framework_TestCase
         $account = new \Model\Account($initial_balance);
         $account->deposit($deposit);
         $this->assertEquals($deposit + $initial_balance, $account->getBalance());
+        return array($account, $account->getBalance());
+    }
+
+    /**
+     *
+     * @depends testDeposit
+     */
+    public function testPayDependent($params) {
+        //echo $params[1];
+        $params[0]->pay(23.32);
+        $this->assertSame(121.13, $params[0]->getBalance());
     }
 
     /**
@@ -62,6 +74,7 @@ class PHPUnitIntro_AnnotationsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group issue-101
      * @group exceptions
      * @expectedException \Model\Account\Exception
      */
