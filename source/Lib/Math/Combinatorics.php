@@ -5,7 +5,7 @@
  * @package Math
  * @subpackage Combinatorics
  */
- require_once 'Exceptions.php';
+namespace Lib\Math;
  
 class Combinatorics
 {

@@ -5,7 +5,7 @@
  * @package Math
  * @subpackage Geometry
  */
-require_once 'Exceptions.php';
+namespace Lib\Math;
 
 class Circle
 {
@@ -19,7 +19,7 @@ class Circle
 	 * Creates circle where radius is $r
 	 *
 	 * @param float $r
-	 * @throws Argument_Exception if $r is not positive
+	 * @throws Exception\Argument if $r is not positive
 	 */
 	function __construct($r)
 	{
@@ -30,7 +30,7 @@ class Circle
 	 *
 	 * @param float $r
 	 * @return void
-	 * @throws Argument_Exception if $r is not positive
+	 * @throws Exception\Argument if $r is not positive
 	 */
 	function setRadius($r)
 	{

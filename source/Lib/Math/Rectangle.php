@@ -5,13 +5,14 @@
  * @package Math
  * @subpackage Geometry
  */
-require_once 'Exceptions.php';
+namespace Lib\Math;
+
 class Rectangle
 {
     private $width, $height;
     /**
      * Constructs rectangle
-     * throws Argument_Exception when $width or $height negative
+     * throws Exception\Argument when $width or $height negative
      * 
      * @param float $width
      * @param float $height
@@ -25,7 +26,7 @@ class Rectangle
     }
     /**
      * Set rectangle width
-     * throws Argument_Exception when $width negative
+     * throws Exception\Argument when $width negative
      * 
      * @param float $width
      * @return void
@@ -33,13 +34,13 @@ class Rectangle
     public function setWidth ($width)
     {
         if (! is_float($width) || $width <= 0.0) {
-            throw new Argument_Exception();
+            throw new Exception\Argument();
         }
         $this->width = $width;
     }
     /**
      * Set rectangle height
-     * throws Argument_Exception when $height negative
+     * throws Exception\Argument when $height negative
      * 
      * @param float $height
      * @return void
@@ -47,13 +48,13 @@ class Rectangle
     public function setHeight ($height)
     {
         if (! is_float($height) || $height <= 0.0) {
-            throw new Argument_Exception();
+            throw new Exception\Argument();
         }
         $this->height = $height;
     }
     /**
      * Set rectangle width
-     * throws Property_Exception when width unknown
+     * throws Exception\Property when width unknown
      * 
      * @return float
      */
@@ -63,7 +64,7 @@ class Rectangle
     }
     /**
      * Get rectangle height
-     * throws Property_Exception when height unknown
+     * throws Exception\Property when height unknown
      * 
      * @return float
      */
@@ -73,7 +74,7 @@ class Rectangle
     }
     /**
      * Returns square of rectangle
-     * throws Property_Exception if width or height is not set
+     * throws Exception\Property if width or height is not set
      * 
      * @return float
      */
@@ -83,7 +84,7 @@ class Rectangle
     }
     /**
      * Returns perimeter of rectangle
-     * throws Property_Exception if width or height is not set
+     * throws Exception\Property if width or height is not set
      * 
      * @return float
      */
