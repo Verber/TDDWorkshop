@@ -1,0 +1,13 @@
+{
+    "name": "verber/TDDWorkshop",
+    "description": "Materials for TDD Workshop",
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "authors": [
+        {
+            "name": "Ivan Mosiev",
+            "email": "i.k.mosev@gmail.com"
+        }
+    ]
+}
