@@ -5,41 +5,51 @@
  * @author   Ivan Mosiev <i.k.mosev@gmail.com>
  */
 class WithBadIsolationTest extends PHPUnit_Framework_TestCase
-{   
+{
+    /**
+     * @var PDO $db;
+     */
     private static $db;
 
     public static function setUpBeforeClass()
     {
-        self::$db = sqlite_open(dirname(__FILE__) . '/phone_book');
-    }
-
-    public static function tearDownAfterClass()
-    {
-        sqlite_close(self::$db);
+        self::$db = new PDO('sqlite:' . dirname(__FILE__) . '/phone_book');
     }
     
     function testModelGet()
     {
-        $query_res = sqlite_array_query(self::$db, "SELECT * FROM phone_book");
-        $entry = $query_res[1];
+        $sql = "SELECT * FROM phone_book";
+        $query_res = self::$db->query($sql);
+        if ($query_res) {
+            $users = $query_res->fetchAll();
+        }
+        $entry = $users[0];
         $this->assertEquals('Bill', $entry['name']);
     }
     
     function testModelAppend()
     {
-        sqlite_query(self::$db, "INSERT INTO phone_book VALUES('Phill', '123-54-67')");
-        $sql_res = sqlite_single_query(self::$db, "SELECT COUNT(*) FROM phone_book");
-        $this->assertEquals(3, $sql_res);
-        $sql_res = sqlite_single_query(self::$db, "SELECT phone FROM phone_book WHERE name = 'Phill'");
-        $this->assertEquals('123-54-67', $sql_res);
+        self::$db->exec(
+            "INSERT INTO phone_book VALUES('Phill', '123-54-67')"
+        );
+        $sql = "SELECT COUNT(*) FROM phone_book";
+        $sql_res = self::$db->query($sql);
+        $this->assertEquals(3, $sql_res->fetchColumn());
+        $sql = "SELECT phone FROM phone_book WHERE name = 'Phill'";
+        $sql_res = self::$db->query($sql);
+        $this->assertEquals('123-54-67', $sql_res->fetchColumn());
     }
     
     function testModelDelete()
     {
-        sqlite_query(self::$db, "DELETE FROM phone_book WHERE name = 'Phill'");
-        $sql_res = sqlite_single_query(self::$db, "SELECT COUNT(*) FROM phone_book");
-        $this->assertEquals(2, $sql_res);
-        $sql_res = sqlite_single_query(self::$db, "SELECT phone FROM phone_book WHERE name = 'Phill'");
-        $this->assertEquals(null, $sql_res);
+        self::$db->exec(
+            "DELETE FROM phone_book WHERE name = 'Phill'"
+        );
+        $sql = "SELECT COUNT(*) FROM phone_book";
+        $sql_res = self::$db->query($sql);
+        $this->assertEquals(2, $sql_res->fetchColumn());
+        $sql = "SELECT phone FROM phone_book WHERE name = 'Phill'";
+        $sql_res = self::$db->query($sql);
+        $this->assertEquals(array(), $sql_res->fetchAll());
     }
 }
