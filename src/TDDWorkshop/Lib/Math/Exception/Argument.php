@@ -1,5 +1,5 @@
 <?php
-namespace Lib\Math\Exception;
+namespace TDDWorkshop\Lib\Math\Exception;
 
 class Argument extends \Exception
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Model;
+namespace TDDWorkshop\Model;
 /**
  * Class for demonstration only
  *

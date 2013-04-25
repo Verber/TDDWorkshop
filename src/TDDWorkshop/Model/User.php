@@ -1,5 +1,5 @@
 <?php
-namespace Model;
+namespace TDDWorkshop\Model;
 /**
  * This class illustrates mocks and stubs usage
  *

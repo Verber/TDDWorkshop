@@ -1,41 +1,25 @@
 <?php
-require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
-class ExampleTest extends PHPUnit_Extensions_SeleniumTestCase
+class ExampleTest extends PHPUnit_Extensions_Selenium2TestCase
 {
-    protected $captureScreenshotOnFailure = TRUE;
-    protected $screenshotPath = '/var/www/localhost/htdocs/screenshots';
-    protected $screenshotUrl = 'http://localhost/screenshots';
-
-    public static $browsers = array(
-      array(
-        'name'    => 'Firefox',
-        'browser' => '*firefox',
-        'host'    => 'localhost',
-        'port'    => 4444,
-        'timeout' => 30000,
-      ),
-    );
-
     protected function setUp()
     {
-        $this->setBrowser('*firefox'); //remove to use self::$browsers
+        $this->setBrowser('firefox');
         $this->setBrowserUrl('http://www.google.com.ua/');
     }
 
     public function testTitle()
     {
-        $this->open('http://www.google.com.ua/');
-        $this->assertTitle('Google');
+        $this->url('http://www.google.com.ua/');
+        $this->assertEquals('Google', $this->title());
     }
 
     public function testPhpunit()
     {
-        $this->open('http://www.google.com.ua/');
-        $this->type('name=q', 'phpunit');
-        $this->click('name=btnG');
-        sleep(3);
-        $this->assertElementContainsText('id=ires', 'PHPUnit');
+        $this->timeouts()->implicitWait(10000);
+        $this->url('http://www.google.com.ua/');
+        $this->byName('q')->value('phpunit');
+        $this->assertContains('PHPUnit', $this->byId('ires')->text());
     }
 
 }

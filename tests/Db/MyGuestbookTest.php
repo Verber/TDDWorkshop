@@ -1,5 +1,5 @@
 <?php
-require_once "PHPUnit/Extensions/Database/TestCase.php";
+use TDDWorkshop\Model\MyGuestbook;
 
 class MyGuestbookTest extends PHPUnit_Extensions_Database_TestCase
 {
@@ -30,7 +30,7 @@ class MyGuestbookTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testNewRecord_assertCount()
     {
-        $guestbook = new \Model\MyGuestbook();
+        $guestbook = new MyGuestbook();
         $guestbook->addEntry("suzy", "Hello world!");
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('guestbook'), "Inserting failed");
@@ -38,7 +38,7 @@ class MyGuestbookTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testNewRecord_assert_set()
     {
-        $guestbook = new \Model\MyGuestbook();
+        $guestbook = new MyGuestbook();
         $guestbook->addEntry("suzy", "Hello world!");
 
         $queryTable = $this->getConnection()->createQueryTable(

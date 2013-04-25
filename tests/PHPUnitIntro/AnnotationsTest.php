@@ -9,22 +9,22 @@ class PHPUnitIntro_AnnotationsTest extends PHPUnit_Framework_TestCase
     /**
      * @group account
      * @group exceptions
-     * @expectedException \Model\Account\Exception
+     * @expectedException TDDWorkshop\Model\Account\Exception
      */
     public function testConstructorException()
     {
-        $account = new \Model\Account('some shit');
+        $account = new TDDWorkshop\Model\Account('some shit');
     }
 
     public function testConstructorZero()
     {
-        $account = new \Model\Account(0.0);
+        $account = new TDDWorkshop\Model\Account(0.0);
         $this->assertSame(0.0, $account->getBalance());
     }
 
     public function testGetBalance()
     {
-        $account = new \Model\Account(123.32);
+        $account = new TDDWorkshop\Model\Account(123.32);
         $this->assertEquals(123.32, $account->getBalance());
     }
 
@@ -35,7 +35,7 @@ class PHPUnitIntro_AnnotationsTest extends PHPUnit_Framework_TestCase
     {
         $initial_balance = 123.32;
         $deposit = 21.13;
-        $account = new \Model\Account($initial_balance);
+        $account = new TDDWorkshop\Model\Account($initial_balance);
         $account->deposit($deposit);
         $this->assertEquals($deposit + $initial_balance, $account->getBalance());
         return array($account, $account->getBalance());
@@ -53,34 +53,34 @@ class PHPUnitIntro_AnnotationsTest extends PHPUnit_Framework_TestCase
 
     /**
      * @group exceptions
-     * @expectedException \Model\Account\Exception
+     * @expectedException TDDWorkshop\Model\Account\Exception
      */
     public function testDepositExceptionNegative()
     {
         $deposit = -5;
-        $account = new \Model\Account(0.0);
+        $account = new TDDWorkshop\Model\Account(0.0);
         $account->deposit($deposit);
     }
 
     /**
      * @group exceptions
-     * @expectedException \Model\Account\Exception
+     * @expectedException TDDWorkshop\Model\Account\Exception
      */
     public function testDepositExceptionNotFloat()
     {
         $deposit = 'something';
-        $account = new \Model\Account(0.0);
+        $account = new TDDWorkshop\Model\Account(0.0);
         $account->deposit($deposit);
     }
 
     /**
      * @group issue-101
      * @group exceptions
-     * @expectedException \Model\Account\Exception
+     * @expectedException TDDWorkshop\Model\Account\Exception
      */
     public function testPayExceptionNotFloat()
     {
-        $account = new \Model\Account(0);
+        $account = new TDDWorkshop\Model\Account(0);
         $account->pay('$pay_amount');
 
     }
@@ -88,11 +88,11 @@ class PHPUnitIntro_AnnotationsTest extends PHPUnit_Framework_TestCase
     /**
      * @group issue-122
      * @group exceptions
-     * @expectedException \Model\Account\Exception
+     * @expectedException TDDWorkshop\Model\Account\Exception
      */
     public function testPayExceptionNegative()
     {
-        $account = new \Model\Account(0);
+        $account = new TDDWorkshop\Model\Account(0);
         $account->pay(-12.11);
     }
 
@@ -102,7 +102,7 @@ class PHPUnitIntro_AnnotationsTest extends PHPUnit_Framework_TestCase
      */
     public function testPay($initial_balance, $pay_amount, $result, $rest)
     {
-        $account = new \Model\Account($initial_balance);
+        $account = new TDDWorkshop\Model\Account($initial_balance);
         $this->assertSame($result, $account->pay($pay_amount));
         $this->assertEquals($rest, $account->getBalance());
 

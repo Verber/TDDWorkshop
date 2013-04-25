@@ -1,5 +1,5 @@
 <?php
-namespace Model;
+namespace TDDWorkshop\Model;
 /**
  * Created by JetBrains PhpStorm.
  * User: verber

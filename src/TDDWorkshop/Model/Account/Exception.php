@@ -1,5 +1,5 @@
 <?php
-namespace Model\Account;
+namespace TDDWorkshop\Model\Account;
 /**
  * Exception for Account
  *

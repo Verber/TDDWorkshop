@@ -5,7 +5,7 @@
  * @package Math
  * @subpackage Combinatorics
  */
-namespace Lib\Math;
+namespace TDDWorkshop\Lib\Math;
  
 class Combinatorics
 {

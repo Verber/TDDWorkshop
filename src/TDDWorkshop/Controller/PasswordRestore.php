@@ -1,5 +1,8 @@
 <?php
-namespace Controller;
+namespace TDDWorkshop\Controller;
+
+use TDDWorkshop\Lib\IMailer;
+use TDDWorkshop\Model\User;
 /**
  * This class illustrates mocks and stubs usage
  *
@@ -10,7 +13,7 @@ class PasswordRestore {
     private $_mailer;
     private $_user;
 
-    public function  __construct(\Lib\IMailer $mailer, \Model\User $user) {
+    public function  __construct(IMailer $mailer, User $user) {
         $this->_mailer = $mailer;
         $this->_user = $user;
     }

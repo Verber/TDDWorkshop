@@ -1,5 +1,4 @@
 <?php
-require_once dirname(__FILE__) . '/../../src/bootstrap.php';
 /**
  * This class is example of simplest PHPUnit test case
  *
@@ -41,7 +40,7 @@ class PHPUnitIntro_HelloTest extends PHPUnit_Framework_TestCase
         //Arrange
         $login = 'admin';
         $password = 'password';
-        $loginController = new \Controller\Login;
+        $loginController = new TDDWorkshop\Controller\Login;
         //Act
         $result = $loginController->checkLogin($login, $password);
         //Assert

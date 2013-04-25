@@ -1,5 +1,5 @@
 <?php
-namespace Lib;
+namespace TDDWorkshop\Lib;
 /**
  * This class illustrates mocks and stubs usage
  *

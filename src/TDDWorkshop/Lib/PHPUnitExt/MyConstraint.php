@@ -1,5 +1,5 @@
 <?php
-namespace Lib\PHPUnitExt;
+namespace TDDWorkshop\Lib\PHPUnitExt;
 
 class MyConstraint extends PHPUnit_Framework_Constraint
 {

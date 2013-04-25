@@ -5,7 +5,7 @@
  * @package Math
  * @subpackage Geometry
  */
-namespace Lib\Math;
+namespace TDDWorkshop\Lib\Math;
 
 class Circle
 {

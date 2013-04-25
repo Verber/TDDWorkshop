@@ -1,5 +1,5 @@
 <?php
-namespace Controller;
+namespace TDDWorkshop\Controller;
 
 /**
  * This is very simple controller

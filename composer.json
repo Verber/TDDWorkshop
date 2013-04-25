@@ -10,6 +10,9 @@
         "phpunit/php-code-coverage": "1.2.9",
         "phpunit/dbunit": "1.2.3"
     },
+    "autoload": {
+        "psr-0": {"TDDWorkshop": "src/"}
+    },
     "authors": [
         {
             "name": "Ivan Mosiev",
