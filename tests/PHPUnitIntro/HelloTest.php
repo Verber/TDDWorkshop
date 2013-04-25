@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../../source/bootstrap.php';
+require_once dirname(__FILE__) . '/../../src/bootstrap.php';
 /**
  * This class is example of simplest PHPUnit test case
  *
